@@ -7,6 +7,7 @@
 #include "dispatcher.h"
 #include "memory.h"
 #include "string.h"
+#include "STRING_OPERATIONS.h"
 
 // create the mlf sched
 MlfQueue queue1, queue2, queue3, queue4;
@@ -53,16 +54,16 @@ int *schedSelect()
     int pid = 0;
     int queueQuantum = 0;
 
-    if (!isEmpty(&queue1)) {
+    if (!isMlfEmpty(&queue1)) {
         pid = mlfDeQueue(&queue1);
         queueQuantum = queue1.quantum;
-    }else if (!isEmpty(&queue2)) {
+    }else if (!isMlfEmpty(&queue2)) {
         pid = mlfDeQueue(&queue2);
         queueQuantum = queue2.quantum;
-    }else if (!isEmpty(&queue3)) {
+    }else if (!isMlfEmpty(&queue3)) {
         pid = mlfDeQueue(&queue3);
         queueQuantum = queue3.quantum;
-    }else if (!isEmpty(&queue4)) {
+    }else if (!isMlfEmpty(&queue4)) {
         pid = mlfDeQueue(&queue4);
         queueQuantum = queue4.quantum;
     }else return NULL;
@@ -72,9 +73,11 @@ int *schedSelect()
     int priority = atoi(getPCBField("PRIORITY", pid).value);
     priority++;
 
-    char priorityStr[12];
+    char *priorityStr = malloc(sizeof(char) * 12);
 
-    sprintf(priorityStr, "%d", priority);
+    itoa(priority, priorityStr, 10);
+
+
 
     setPCBField("PRIORITY", pid, priorityStr);
     setPCBField("STATE", pid, "RUNNING");
@@ -100,9 +103,9 @@ void schedBlock(int pid)
         priority++;
     }
 
-    char priorityStr[12];
+    char *priorityStr = malloc(sizeof(char) * 10);
 
-    sprintf(priorityStr, "%d", priority);
+    itoa(priority, priorityStr, 10);
 
     setPCBField("STATE", pid,  "BLOCKED");
     setPCBField("PRIORITY", pid, priorityStr);

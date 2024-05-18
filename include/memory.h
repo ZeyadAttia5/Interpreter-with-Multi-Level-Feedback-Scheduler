@@ -25,6 +25,7 @@ MemoryWord getPCBField(char *fieldName, int pcbIndex);
 void setPCBField(char *fieldName, int pcbIndex, char *value);
 void addNewPCB(char *upperBound, char *lowerBound);
 void printMemory();
+char *getVariableValue(char *variableName, int runningPID);
 
 
 #endif //OS_PROJECT_MEMORY_H

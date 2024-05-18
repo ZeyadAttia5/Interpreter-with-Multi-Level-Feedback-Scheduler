@@ -10,5 +10,5 @@ void printFromTo(int x, int y);
 void semWait(char *x);
 void semSignal(char *x);
 void executeInstruction(MemoryWord currentInstruction);
-
+int isInstruction(char *instruction);
 #endif //OS_PROJECT_INSRTUCTION_SET_H

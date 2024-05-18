@@ -11,7 +11,7 @@ int currentQueueQuantum;
 void initDispatcher()
 {
     runningPid = -1;
-    runningQuantum = 0;
+    runningQuantum = 1;
     currentQueueQuantum = 0;
 }
 
@@ -30,17 +30,13 @@ void dispatch()
 
     currentQueueQuantum = dispatchedResult[1];
 
-    printf("Selected PID: %d\n", selectedPid);
+
 
 //    if(runningPid != -1) schedEnqueue(selectedPid);
 
     runningPid = selectedPid;
 
-    printf("Running PID: %d\n", runningPid);
 
-    printf("Running Quantum: %d\n", runningQuantum);
-
-    printf("Current Queue Quantum: %d\n", currentQueueQuantum);
 
 
 

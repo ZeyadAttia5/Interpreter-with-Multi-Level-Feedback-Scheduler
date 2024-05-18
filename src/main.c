@@ -12,97 +12,12 @@
 #include "mlf_sched.h"
 #include "queue.h"
 #include "mlf_queue.h"
+#include "STRING_OPERATIONS.h"
 
 
 
 
 int memoryAddress = 0;
-
-/**
- * Splits a string into an array of substrings based on a delimiter.
- *
- * @param a_str The string to be split.
- * @param a_delim The delimiter character used to split the string.
- * @return A dynamically allocated array of strings representing the substrings.
- *         The last element of the array is set to NULL to indicate the end of the list.
- *         The caller is responsible for freeing the memory allocated for the array and its elements.
- */
-char **str_split(char *a_str, const char a_delim)
-{
-    char **result = 0;
-    size_t count = 0;
-    char *tmp = a_str;
-    char *last_comma = 0;
-    char delim[2];
-    delim[0] = a_delim;
-    delim[1] = 0;
-
-    /* Count how many elements will be extracted. */
-    while (*tmp)
-    {
-        if (a_delim == *tmp)
-        {
-            count++;
-            last_comma = tmp;
-        }
-        tmp++;
-    }
-
-    /* Add space for trailing token. */
-    count += last_comma < (a_str + strlen(a_str) - 1);
-
-    /* Add space for terminating null string so caller
-       knows where the list of returned strings ends. */
-    count++;
-
-    result = malloc(sizeof(char *) * count);
-
-    if (result)
-    {
-        size_t idx = 0;
-        char *token = strtok(a_str, delim);
-
-        while (token)
-        {
-            assert(idx < count);
-            *(result + idx++) = strdup(token);
-            token = strtok(0, delim);
-        }
-        assert(idx == count - 1);
-        *(result + idx) = 0;
-    }
-
-    return result;
-}
-
-
-/**
- * Trims leading and trailing whitespace from a string.
- *
- * @param str The string to be trimmed.
- * @return A pointer to the trimmed string.
- */
-char *trimwhitespace(char *str)
-{
-    char *end;
-
-    // Trim leading space
-    while (isspace((unsigned char)*str))
-        str++;
-
-    if (*str == 0) // All spaces?
-        return str;
-
-    // Trim trailing space
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end))
-        end--;
-
-    // Write new null terminator character
-    end[1] = '\0';
-
-    return str;
-}
 
 
 /**
@@ -129,6 +44,14 @@ void parseTokens(char **tokens)
         {
             strcat(value, " ");
             strcat(value, trimwhitespace(*(tokens + 2)));
+
+            // concat rest of tokens to value and separate by space
+            for (int i = 3; *(tokens + i); i++)
+            {
+                strcat(value, " ");
+                strcat(value, trimwhitespace(*(tokens + i)));
+            }
+
         }
 
         setMemoryWholeWord(memoryAddress, name, value);
@@ -159,6 +82,7 @@ void readProgramFile(char *programFilePath)
 
     ssize_t read;
 
+    int lowerBound = memoryAddress;
 
 
     // Read the file line by line
@@ -176,6 +100,17 @@ void readProgramFile(char *programFilePath)
 
         memoryAddress++;
     }
+    memoryAddress += 3;
+
+    int upperBound = memoryAddress;
+
+    char *lowerBoundStr = (char *) malloc(10);
+    itoa(lowerBound, lowerBoundStr, 10);
+
+    char *upperBoundStr = (char *) malloc(10);
+    itoa(upperBound, upperBoundStr, 10);
+
+    addNewPCB(upperBoundStr, lowerBoundStr);
 }
 
 
@@ -202,7 +137,7 @@ void readProgramFiles(char *dirPath) {
         }
         printf("Reading file %s\n", path);
         readProgramFile(path);
-        memoryAddress += 3;
+
     }
 }
 
@@ -211,48 +146,85 @@ int main()
 
 
 
+    initMemory();
+
+
+    readProgramFile("../programs/Program_1.txt");
+    readProgramFile("../programs/Program_2.txt");
+    readProgramFile("../programs/Program_3.txt");
 
 
 
-    readProgramFiles("../programs");
+    /* TODO: AUTO ADD PCBs with their respective upper and lower bounds based on enqueue order
+     * TODO: Calculate KPIs (optional)
+     * TODO: Write new programs to test with
 
-    setMemoryWholeWord(7, "a", "");
-    setMemoryWholeWord(8, "b", "");
-
-    setMemoryWholeWord(17, "a", "");
-    setMemoryWholeWord(18, "b", "");
-    setMemoryWholeWord(19, "input", "");
+    */
 
 
-    addNewPCB("0", "10");
-//    addNewPCB("10", "20");
 
     initializeScheduler();
     initDispatcher();
     schedEnqueue(1);
+    schedEnqueue(2);
+    schedEnqueue(3);
 
 
 
     dispatch();
 
-    int pc = atoi(getPCBField("PC", getRunningPid()).value);
+    while (1) {
 
-    MemoryWord currentInstruction;
-    currentInstruction.name = "assign";
-    currentInstruction.value = "a 5";
 
-    executeInstruction(currentInstruction);
+        if (getRunningPid() == -1) {
+            break;
+        }
 
-    pc++;
 
-    char pcStr[10];
-    sprintf(pcStr, "%d", pc);
-    setPCBField("PC", getRunningPid(), pcStr);
+        int pc = atoi(getPCBField("PC", getRunningPid()).value);
 
-    int runningQuantum = getRunningQuantum();
-    setRunningQuantum(runningQuantum + 1);
+        MemoryWord currentInstruction = getMemoryWord(pc);
+
+        executeInstruction(currentInstruction);
+
+        pc++;
+
+        char *pcStr = (char *) malloc(10);
+        itoa(pc, pcStr, 10);
+
+
+
+        setPCBField("PC", getRunningPid(), pcStr);
+
+        int upperBound = atoi(getPCBField("UPPER_BOUND", getRunningPid()).value);
+        int lowerBound = atoi(getPCBField("LOWER_BOUND", getRunningPid()).value);
+
+        MemoryWord word = getMemoryWord(pc);
+
+        // if word is null or empty or out of bounds or not an instruction
+
+        if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
+            setRunningPid(-1);
+            setRunningQuantum(1);
+            dispatch();
+            continue;
+        }
+
+
+
+        int runningQuantum = getRunningQuantum();
+        setRunningQuantum(runningQuantum + 1);
+
+        if (runningQuantum == getCurrentQueueQuantum()){
+            schedEnqueue(getRunningPid());
+            setRunningPid(-1);
+            setRunningQuantum(1);
+            dispatch();
+        }
+    }
 
     printMemory();
+
 
 }
 

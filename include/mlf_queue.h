@@ -13,7 +13,7 @@ typedef struct MlfQueue
 void createMlfQueue(MlfQueue *queue, int quantum);
 void mlfEnQueue(MlfQueue *queue, int key);
 int mlfDeQueue(MlfQueue *queue);
-int isEmpty(MlfQueue *queue);
+int isMlfEmpty(MlfQueue *queue);
 void printMlfQueue(MlfQueue *queue);
 
 #endif
