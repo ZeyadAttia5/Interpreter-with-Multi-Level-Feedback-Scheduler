@@ -1,7 +1,7 @@
 #ifndef MLF_QUEUE_H
 #define MLF_QUEUE_H
 
-#include "../queue.h"
+#include "queue.h"
 
 typedef struct MlfQueue
 {
@@ -11,8 +11,9 @@ typedef struct MlfQueue
 } MlfQueue;
 
 void createMlfQueue(MlfQueue *queue, int quantum);
-void mlfEnQueue(MlfQueue *queue, PCB *key);
-PCB *mlfDeQueue(MlfQueue *queue);
+void mlfEnQueue(MlfQueue *queue, int key);
+int mlfDeQueue(MlfQueue *queue);
 int isEmpty(MlfQueue *queue);
+void printMlfQueue(MlfQueue *queue);
 
 #endif

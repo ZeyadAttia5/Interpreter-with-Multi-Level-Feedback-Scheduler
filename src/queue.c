@@ -2,13 +2,13 @@
 // implementation of queue
 #include <stdio.h>
 #include <stdlib.h>
-#include "pcb.h"
+
 #include "queue.h"
 
 
 // A linked list (LL) node to store a queue entry
 struct QNode {
-	PCB *key;
+	int key;
 	struct QNode* next;
 };
 
@@ -17,7 +17,7 @@ struct QNode {
 
 
 // A utility function to create a new linked list node.
-struct QNode* newNode(PCB *k)
+struct QNode* newNode(int k)
 {
 	struct QNode* temp
 		= (struct QNode*)malloc(sizeof(struct QNode));
@@ -36,8 +36,11 @@ struct Queue* createQueue()
 }
 
 // The function to add a key k to q
-void enQueue(struct Queue* q, PCB *k)
+void enQueue(struct Queue* q, int k)
 {
+
+    q->size++;
+
 	// Create a new LL node
 	struct QNode* temp = newNode(k);
 
@@ -54,11 +57,13 @@ void enQueue(struct Queue* q, PCB *k)
 }
 
 // Function to remove a key from given queue q
-PCB *deQueue(struct Queue* q)
+int deQueue(struct Queue* q)
 {
 	// If queue is empty, return NULL.
 	if (q->front == NULL)
-		return NULL;
+		return -1;
+
+    q->size--;
 
 	// Store previous front and move front one node ahead
 	struct QNode* temp = q->front;
@@ -69,10 +74,30 @@ PCB *deQueue(struct Queue* q)
 	if (q->front == NULL)
 		q->rear = NULL;
 
-	PCB *dequeuedValue = temp->key;
+	int dequeuedValue = temp->key;
 
 	free(temp);
 	return dequeuedValue;
 }
 
+/* Function to print the queue */
+void printQueue(struct Queue* q)
+{
+    struct QNode* temp = q->front;
+    while (temp != NULL) {
+        printf("%d ", temp->key);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int isEmpty(struct Queue* q)
+{
+    return q->size == 0;
+}
+
+int getSize(struct Queue* q)
+{
+    return q->size;
+}
 
