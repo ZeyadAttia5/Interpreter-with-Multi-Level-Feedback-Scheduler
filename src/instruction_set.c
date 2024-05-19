@@ -8,14 +8,18 @@
 #include "pthread.h"
 #include "mlf_sched.h"
 #include "STRING_OPERATIONS.h"
-#define LOCKED 0
-#define UNLOCKED 1
+#include "../include/semaphore.h"
 
 
-//int runningPid;
-//int runningQuantum;
+semaphore *inputBufferSemaphore, *outputBufferSemaphore, *fileBufferSemaphore;
 
-int outputBufferMutex = UNLOCKED, fileBufferMutex = UNLOCKED, inputBufferMutex = UNLOCKED;
+void instruction_set_init() {
+
+    create_semaphore(1, "inputBuffer", &inputBufferSemaphore);
+    create_semaphore(1, "outputBuffer", &outputBufferSemaphore);
+    create_semaphore(1, "fileBuffer", &fileBufferSemaphore);
+
+}
 
 void print(char *x)
 {
@@ -27,7 +31,7 @@ void assign(char *x, char *y)
     {
         char *input = malloc(100);
         // TODO: MUST ADD "Please enter a value for x" before scanf but doesn't work
-
+        printf("Please enter a value for %s: ", x);
         scanf("%[^\n]%*c", input);
         y = input;
     }
@@ -111,36 +115,11 @@ void printFromTo(int x, int y)
 void semWait(char *x)
 {
      if (!strcmp(x, "userInput")){
-         if(inputBufferMutex == LOCKED)
-         {
-             schedBlock(getRunningPid());
-
-         }else
-         {
-             printf("input buffer lock aquired by process %d\n", getRunningPid());
-             inputBufferMutex = LOCKED;
-         }
+         wait_semaphore(inputBufferSemaphore, getRunningPid());
      }else if (!strcmp(x, "userOutput")) {
-         if (outputBufferMutex == LOCKED) {
-
-             schedBlock(getRunningPid());
-
-         }
-         else
-         {
-             printf("output buffer lock aquired by process %d\n", getRunningPid());
-             outputBufferMutex = LOCKED;
-         }
+         wait_semaphore(outputBufferSemaphore, getRunningPid());
      } else if (!strcmp(x, "file")) {
-         if (fileBufferMutex == LOCKED) {
-             schedBlock(getRunningPid());
-
-         }
-         else
-         {
-             printf("file buffer lock aquired by process %d\n", getRunningPid());
-             fileBufferMutex = LOCKED;
-         }
+            wait_semaphore(fileBufferSemaphore, getRunningPid());
      }
 
 
@@ -152,21 +131,21 @@ void semWait(char *x)
 
 void semSignal(char *x)
 {
+    int pid = -1;
 
     if (!strcmp(x, "userInput")) {
-        inputBufferMutex = UNLOCKED;
-        try_unblock(x);
-        printf("input buffer lock released by process %d\n", getRunningPid());
+        pid = signal_semaphore(inputBufferSemaphore);
     } else if (!strcmp(x, "userOutput")) {
-        outputBufferMutex = UNLOCKED;
-        try_unblock(x);
-        printf("output buffer lock released by process %d\n", getRunningPid());
+        pid = signal_semaphore(outputBufferSemaphore);
     } else if (!strcmp(x, "file")) {
-        fileBufferMutex = UNLOCKED;
-        try_unblock(x);
-        printf("file buffer lock released by process %d\n", getRunningPid());
+        pid = signal_semaphore(fileBufferSemaphore);
+    }else{
+        printf("Invalid semaphore name\n");
+        return;
     }
 
+    if (pid != -1)
+        schedEnqueue(pid);
 
 }
 

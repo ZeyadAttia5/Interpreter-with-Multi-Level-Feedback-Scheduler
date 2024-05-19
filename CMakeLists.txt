@@ -15,7 +15,9 @@ set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 # Create the executable named main from the source files
 add_executable(main ${SOURCES}
         include/STRING_OPERATIONS.h
-        src/STRING_OPERATIONS.c)
+        src/STRING_OPERATIONS.c
+        include/semaphore.h
+        src/semaphore.c)
 
 # Link the math library
 target_link_libraries(main m)

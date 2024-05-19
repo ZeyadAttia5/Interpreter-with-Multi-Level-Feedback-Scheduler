@@ -2,6 +2,8 @@
 #define OS_PROJECT_INSRTUCTION_SET_H
 #include "memory.h"
 
+
+void instruction_set_init();
 void print(char *x);
 void assign(char *x, char *y);
 void writeFile(char *filename, char *data);

@@ -18,6 +18,7 @@
 
 
 int memoryAddress = 0;
+int pid = 1;
 
 
 /**
@@ -111,6 +112,7 @@ void readProgramFile(char *programFilePath)
     itoa(upperBound, upperBoundStr, 10);
 
     addNewPCB(upperBoundStr, lowerBoundStr);
+    schedEnqueue(pid++);
 }
 
 
@@ -144,30 +146,26 @@ void readProgramFiles(char *dirPath) {
 int main()
 {
 
-
+    /* TODO: Write new programs to test with */
 
     initMemory();
-
-
-    readProgramFile("../programs/Program_1.txt");
-    readProgramFile("../programs/Program_2.txt");
-    readProgramFile("../programs/Program_3.txt");
-
-
-
-    /* TODO: AUTO ADD PCBs with their respective upper and lower bounds based on enqueue order
-     * TODO: Calculate KPIs (optional)
-     * TODO: Write new programs to test with
-
-    */
-
-
-
     initializeScheduler();
     initDispatcher();
-    schedEnqueue(1);
-    schedEnqueue(2);
-    schedEnqueue(3);
+    instruction_set_init();
+
+    readProgramFile("../programs/Program_1.txt");
+    readProgramFile("../programs/Program_3.txt");
+    readProgramFile("../programs/Program_2.txt");
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -204,9 +202,13 @@ int main()
         // if word is null or empty or out of bounds or not an instruction
 
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
+            // remove PCB from memory
+//            removePCB(getRunningPid());
+
             setRunningPid(-1);
             setRunningQuantum(1);
             dispatch();
+
             continue;
         }
 

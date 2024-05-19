@@ -139,6 +139,25 @@ void addNewPCB(char *upperBound, char *lowerBound)
 
 }
 
+void removePCB(int pcbIndex)
+{
+    if (pcbIndex < 0 || pcbIndex > PCB_COUNT)
+    {
+        printf("PCB index out of bounds\n");
+        return;
+    }
+
+    int pcbBaseAddress = MEMORY_SIZE - pcbIndex * PCB_SIZE;
+
+    for (int i = 0; i < PCB_SIZE; i++)
+    {
+        memory[pcbBaseAddress + i].name = "";
+        memory[pcbBaseAddress + i].value = "";
+    }
+
+    PCB_COUNT--;
+}
+
 void printMemory()
 {
     for (int i = 0; i < MEMORY_SIZE; i++)
