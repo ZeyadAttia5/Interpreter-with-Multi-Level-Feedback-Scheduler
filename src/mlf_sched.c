@@ -97,18 +97,10 @@ int *schedSelect()
 void schedBlock(int pid)
 {
 
-    int priority = atoi(getPCBField("PRIORITY", pid).value);
-    if(getRunningQuantum() == pow(2, priority))
-    {
-        priority++;
-    }
 
-    char *priorityStr = malloc(sizeof(char) * 10);
-
-    itoa(priority, priorityStr, 10);
 
     setPCBField("STATE", pid,  "BLOCKED");
-    setPCBField("PRIORITY", pid, priorityStr);
+
 
     enQueue(blockedQueue, pid);
 }
@@ -123,25 +115,25 @@ void unblock()
 
 void printQueues()
 {
-    printf("Queue 1: ");
+    printf("MLF Queue 1: ");
     printMlfQueue(&queue1);
     printf("\n");
 
-    printf("Queue 2: ");
+    printf("MLF Queue 2: ");
     printMlfQueue(&queue2);
     printf("\n");
 
-    printf("Queue 3: ");
+    printf("MLF Queue 3: ");
     printMlfQueue(&queue3);
     printf("\n");
 
-    printf("Queue 4: ");
+    printf("MLF Queue 4: ");
     printMlfQueue(&queue4);
     printf("\n");
 
-//    printf("Blocked Queue: ");
-//    printQueue(blockedQueue);
-//    printf("\n");
+    printf("General Blocked Queue: ");
+    printQueue(blockedQueue);
+    printf("\n");
 }
 
 void try_unblock(char *resource)
@@ -168,4 +160,9 @@ void try_unblock(char *resource)
         }
 
     }
+}
+
+void schedRemoveBlockedKey(int unblockedPid)
+{
+    removeKey(blockedQueue, unblockedPid);
 }

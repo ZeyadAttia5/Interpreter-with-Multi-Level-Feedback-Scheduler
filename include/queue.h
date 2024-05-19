@@ -12,5 +12,6 @@ struct Queue* createQueue();
 void enQueue(struct Queue* q, int k);
 int deQueue(struct Queue* q);
 void printQueue(struct Queue* q);
+void removeKey(struct Queue* q, int k);
 
 #endif

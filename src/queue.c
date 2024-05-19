@@ -2,8 +2,9 @@
 // implementation of queue
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "queue.h"
+#include "STRING_OPERATIONS.h"
 
 
 // A linked list (LL) node to store a queue entry
@@ -83,11 +84,16 @@ int deQueue(struct Queue* q)
 /* Function to print the queue */
 void printQueue(struct Queue* q)
 {
+    
     struct QNode* temp = q->front;
     while (temp != NULL) {
         printf("%d ", temp->key);
         temp = temp->next;
+
+
+
     }
+
     printf("\n");
 }
 
@@ -101,3 +107,30 @@ int getSize(struct Queue* q)
     return q->size;
 }
 
+void removeKey(struct Queue* q, int k)
+{
+    struct QNode* temp = q->front;
+    struct QNode* prev = NULL;
+
+    while (temp != NULL && temp->key != k) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        return;
+    }
+
+    if (prev == NULL) {
+        q->front = temp->next;
+    } else {
+        prev->next = temp->next;
+    }
+
+    if (q->rear == temp) {
+        q->rear = prev;
+    }
+
+    free(temp);
+    q->size--;
+}

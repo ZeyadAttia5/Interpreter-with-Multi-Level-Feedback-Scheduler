@@ -1,6 +1,7 @@
 #include "../include/semaphore.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "mlf_sched.h"
 
 
 
@@ -38,6 +39,8 @@ int signal_semaphore(semaphore *s)
 
     int unblockedPid = deQueue(s->queue);
 
+    schedRemoveBlockedKey(unblockedPid);
+
     return unblockedPid;
 
 }
@@ -53,6 +56,7 @@ int try_wait_semaphore(semaphore *s, int pid)
     if(s->value == LOCKED)
     {
         enQueue(s->queue, pid);
+        schedBlock(pid);
         return 0;
     }else
     {

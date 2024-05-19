@@ -192,6 +192,9 @@ int main(int argc, char **argv)
 
         executeInstruction(currentInstruction);
 
+        if (getRunningPid() == -1) {
+            continue;
+        }
         incrementPC(getRunningPid());
 
         pc = atoi(getPCBField("PC", getRunningPid()).value);
@@ -206,9 +209,6 @@ int main(int argc, char **argv)
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
             // remove PCB from memory
             // removeProcess(getRunningPid());
-
-            setRunningPid(-1);
-            setRunningQuantum(1);
             dispatch();
 
             continue;
@@ -219,10 +219,8 @@ int main(int argc, char **argv)
         int runningQuantum = getRunningQuantum();
         setRunningQuantum(runningQuantum + 1);
 
-        if (runningQuantum >= getCurrentQueueQuantum()){
+        if (++runningQuantum >= getCurrentQueueQuantum()){
             schedEnqueue(getRunningPid());
-            setRunningPid(-1);
-            setRunningQuantum(1);
             dispatch();
         }
     }

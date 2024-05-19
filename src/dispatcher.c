@@ -13,12 +13,14 @@ int currentQueueQuantum;
 void initDispatcher()
 {
     runningPid = -1;
-    runningQuantum = 1;
+    runningQuantum = 0;
     currentQueueQuantum = 0;
 }
 
 void dispatch()
 {
+
+    runningPid = -1;
 
     int *dispatchedResult = schedSelect();
 
@@ -32,6 +34,8 @@ void dispatch()
 
     currentQueueQuantum = dispatchedResult[1];
 
+    runningQuantum = 0;
+
 
 
 //    if(runningPid != -1) schedEnqueue(selectedPid);
@@ -42,7 +46,7 @@ void dispatch()
     int priority = atoi(getPCBField("PRIORITY", selectedPid).value) - 1;
 
     printf("---------------------- Running PID: %d, WITH PRIORITY %d ----------------------\n", getRunningPid(), priority);
-    printSemaphores();
+    printQueues();
 
 
 
