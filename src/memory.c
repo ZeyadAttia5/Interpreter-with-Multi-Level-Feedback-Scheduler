@@ -139,14 +139,12 @@ void addNewPCB(char *upperBound, char *lowerBound)
 
 }
 
-void removePCB(int pcbIndex)
+void removeProcess(int pcbIndex)
 {
-    if (pcbIndex < 0 || pcbIndex > PCB_COUNT)
-    {
-        printf("PCB index out of bounds\n");
-        return;
-    }
 
+    // Clear memory from lower bound to upper bound
+    int upperBound = atoi(getPCBField("UPPER_BOUND", pcbIndex).value);
+    int lowerBound = atoi(getPCBField("LOWER_BOUND", pcbIndex).value);
     int pcbBaseAddress = MEMORY_SIZE - pcbIndex * PCB_SIZE;
 
     for (int i = 0; i < PCB_SIZE; i++)
@@ -155,7 +153,15 @@ void removePCB(int pcbIndex)
         memory[pcbBaseAddress + i].value = "";
     }
 
-    PCB_COUNT--;
+
+
+    for (int i = lowerBound; i <= upperBound; i++)
+    {
+        memory[i].name = "";
+        memory[i].value = "";
+    }
+
+//    PCB_COUNT--;
 }
 
 void printMemory()

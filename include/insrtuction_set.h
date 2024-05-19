@@ -13,4 +13,5 @@ void semWait(char *x);
 void semSignal(char *x);
 void executeInstruction(MemoryWord currentInstruction);
 int isInstruction(char *instruction);
+void printSemaphores();
 #endif //OS_PROJECT_INSRTUCTION_SET_H

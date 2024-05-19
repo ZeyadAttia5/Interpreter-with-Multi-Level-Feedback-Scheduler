@@ -143,8 +143,22 @@ void readProgramFiles(char *dirPath) {
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
+
+//    // To run program run: ./main <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>
+//
+//    if (argc < 7) {
+//        fprintf(stderr, "Usage: %s <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>\n", argv[0]);
+//        return 1;
+//    }
+//
+//    int arrivalTimes[3];
+//
+//    for (int i = 0; i < 3; i++) {
+//        arrivalTimes[i] = atoi(argv[2 * i + 2]);
+//        printf("Arrival time for program %d is %d\n", i + 1, arrivalTimes[i]);
+//    }
 
     /* TODO: Write new programs to test with */
 
@@ -154,8 +168,8 @@ int main()
     instruction_set_init();
 
     readProgramFile("../programs/Program_1.txt");
-    readProgramFile("../programs/Program_3.txt");
     readProgramFile("../programs/Program_2.txt");
+    readProgramFile("../programs/Program_3.txt");
 
 
 
@@ -203,7 +217,7 @@ int main()
 
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
             // remove PCB from memory
-//            removePCB(getRunningPid());
+//            removeProcess(getRunningPid());
 
             setRunningPid(-1);
             setRunningQuantum(1);

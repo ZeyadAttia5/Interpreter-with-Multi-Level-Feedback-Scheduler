@@ -256,3 +256,15 @@ int isInstruction(char *instruction)
     }
     return 0;
 }
+
+void printSemaphores()
+{
+    printf("Input Buffer Semaphore:\n");
+    print_semaphore_queue(inputBufferSemaphore);
+    printf("Output Buffer Semaphore:\n");
+    print_semaphore_queue(outputBufferSemaphore);
+    printf("File Buffer Semaphore:\n");
+    print_semaphore_queue(fileBufferSemaphore);
+
+
+}

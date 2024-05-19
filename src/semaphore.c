@@ -41,3 +41,8 @@ int signal_semaphore(semaphore *s)
     return unblockedPid;
 
 }
+
+void print_semaphore_queue(semaphore *s)
+{
+    printQueue(s->queue);
+}
