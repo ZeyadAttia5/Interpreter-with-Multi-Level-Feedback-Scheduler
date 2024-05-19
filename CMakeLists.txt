@@ -17,7 +17,8 @@ add_executable(main ${SOURCES}
         include/STRING_OPERATIONS.h
         src/STRING_OPERATIONS.c
         include/semaphore.h
-        src/semaphore.c)
+        src/semaphore.c
+        src/pcb.c)
 
 # Link the math library
 target_link_libraries(main m)

@@ -46,3 +46,19 @@ void print_semaphore_queue(semaphore *s)
 {
     printQueue(s->queue);
 }
+
+
+int try_wait_semaphore(semaphore *s, int pid)
+{
+    if(s->value == LOCKED)
+    {
+        enQueue(s->queue, pid);
+        return 0;
+    }else
+    {
+        printf("Process %d acquired resource %s\n", pid, s->resourceName);
+        s->value = LOCKED;
+
+        return 1;
+    }
+}

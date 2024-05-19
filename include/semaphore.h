@@ -18,5 +18,6 @@ int signal_semaphore(semaphore *s);
 
 void print_semaphore_queue(semaphore *s);
 
+int try_wait_semaphore(semaphore *s, int pid);
 
 #endif //OS_PROJECT_SEMAPHORE_H

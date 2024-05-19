@@ -1,20 +1,14 @@
 #ifndef PCB_H
 #define PCB_H
-enum STATE
-{
-    READY,
-    BLOCKED,
-    RUNNING
-};
+#include "memory.h"
 
-typedef struct PCB 
-{
-    int pid;
-    enum STATE state;
-    int priority;
-    int pc;
-    int memoryLowerBound;
-    int memoryUpperBound;
-} PCB;
+void incrementPC(int runningPID);
+void decrementPC(int runningPID);
+int getPCBOffset(char *fieldName);
+MemoryWord getPCBField(char *fieldName, int pcbIndex);
+void setPCBField(char *fieldName, int pcbIndex, char *value);
+void addNewPCB(char *upperBound, char *lowerBound);
+
+
 
 #endif

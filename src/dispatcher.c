@@ -1,8 +1,10 @@
+#include <stdlib.h>
 #include "dispatcher.h"
 #include "mlf_sched.h"
 #include "stddef.h"
 #include "stdio.h"
-
+#include "semaphore.h"
+#include "insrtuction_set.h"
 
 int runningPid;
 int runningQuantum;
@@ -22,7 +24,7 @@ void dispatch()
 
     if(dispatchedResult == NULL)
     {
-        printf("No process to dispatch\n");
+//        printf("No process to dispatch\n");
         return;
     }
 
@@ -35,6 +37,12 @@ void dispatch()
 //    if(runningPid != -1) schedEnqueue(selectedPid);
 
     runningPid = selectedPid;
+
+    // get priority of the selected process
+    int priority = atoi(getPCBField("PRIORITY", selectedPid).value) - 1;
+
+    printf("---------------------- Running PID: %d, WITH PRIORITY %d ----------------------\n", getRunningPid(), priority);
+    printSemaphores();
 
 
 

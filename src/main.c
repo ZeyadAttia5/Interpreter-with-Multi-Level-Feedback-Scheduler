@@ -13,6 +13,7 @@
 #include "queue.h"
 #include "mlf_queue.h"
 #include "STRING_OPERATIONS.h"
+#include "pcb.h"
 
 
 
@@ -145,52 +146,44 @@ void readProgramFiles(char *dirPath) {
 
 int main(int argc, char **argv)
 {
-
-//    // To run program run: ./main <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>
-//
-//    if (argc < 7) {
-//        fprintf(stderr, "Usage: %s <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>\n", argv[0]);
-//        return 1;
-//    }
-//
-//    int arrivalTimes[3];
-//
-//    for (int i = 0; i < 3; i++) {
-//        arrivalTimes[i] = atoi(argv[2 * i + 2]);
-//        printf("Arrival time for program %d is %d\n", i + 1, arrivalTimes[i]);
-//    }
-
     /* TODO: Write new programs to test with */
+
+    // To run program run: ./main <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>
+
+    if (argc < 7) {
+        fprintf(stderr, "Usage: %s <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>\n", argv[0]);
+        return 1;
+    }
+
+    int arrivalTimes[3];
+
+    for (int i = 0; i < 3; i++) {
+        arrivalTimes[i] = atoi(argv[2 * i + 2]);
+
+    }
+
+    int i = 0, clock = 0;
 
     initMemory();
     initializeScheduler();
     initDispatcher();
     instruction_set_init();
 
-    readProgramFile("../programs/Program_1.txt");
-    readProgramFile("../programs/Program_2.txt");
-    readProgramFile("../programs/Program_3.txt");
 
-
-
-
-
-
-
-
-
-
-
-
-
-    dispatch();
 
     while (1) {
 
+        if(clock++ == arrivalTimes[i]) {
+            readProgramFile(argv[2 * i + 1]);
+            i++;
+        }
 
         if (getRunningPid() == -1) {
-            break;
+            dispatch();
+            continue;
         }
+
+
 
 
         int pc = atoi(getPCBField("PC", getRunningPid()).value);
@@ -199,14 +192,9 @@ int main(int argc, char **argv)
 
         executeInstruction(currentInstruction);
 
-        pc++;
+        incrementPC(getRunningPid());
 
-        char *pcStr = (char *) malloc(10);
-        itoa(pc, pcStr, 10);
-
-
-
-        setPCBField("PC", getRunningPid(), pcStr);
+        pc = atoi(getPCBField("PC", getRunningPid()).value);
 
         int upperBound = atoi(getPCBField("UPPER_BOUND", getRunningPid()).value);
         int lowerBound = atoi(getPCBField("LOWER_BOUND", getRunningPid()).value);
@@ -217,7 +205,7 @@ int main(int argc, char **argv)
 
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
             // remove PCB from memory
-//            removeProcess(getRunningPid());
+            // removeProcess(getRunningPid());
 
             setRunningPid(-1);
             setRunningQuantum(1);
@@ -231,7 +219,7 @@ int main(int argc, char **argv)
         int runningQuantum = getRunningQuantum();
         setRunningQuantum(runningQuantum + 1);
 
-        if (runningQuantum == getCurrentQueueQuantum()){
+        if (runningQuantum >= getCurrentQueueQuantum()){
             schedEnqueue(getRunningPid());
             setRunningPid(-1);
             setRunningQuantum(1);
@@ -239,7 +227,7 @@ int main(int argc, char **argv)
         }
     }
 
-    printMemory();
+//    printMemory();
 
 
 }

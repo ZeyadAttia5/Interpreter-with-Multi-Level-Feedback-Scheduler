@@ -68,7 +68,7 @@ int *schedSelect()
         queueQuantum = queue4.quantum;
     }else return NULL;
 
-    printf("PID: %d\n", pid);
+
 
     int priority = atoi(getPCBField("PRIORITY", pid).value);
     priority++;
@@ -139,9 +139,9 @@ void printQueues()
     printMlfQueue(&queue4);
     printf("\n");
 
-    printf("Blocked Queue: ");
-    printQueue(blockedQueue);
-    printf("\n");
+//    printf("Blocked Queue: ");
+//    printQueue(blockedQueue);
+//    printf("\n");
 }
 
 void try_unblock(char *resource)
