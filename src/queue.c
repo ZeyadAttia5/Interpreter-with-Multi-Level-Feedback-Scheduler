@@ -84,7 +84,7 @@ int deQueue(struct Queue* q)
 /* Function to print the queue */
 void printQueue(struct Queue* q)
 {
-    
+
     struct QNode* temp = q->front;
     while (temp != NULL) {
         printf("%d ", temp->key);

@@ -71,6 +71,7 @@ void parseTokens(char **tokens)
  */
 void readProgramFile(char *programFilePath)
 {
+    printf("Reading file %s\n", programFilePath);
     // Open a file in read mode
     FILE *fptr = fopen(programFilePath, "r");
     if (fptr == NULL)
@@ -162,7 +163,7 @@ int main(int argc, char **argv)
 
     }
 
-    int i = 0, clock = 0;
+    int clock = 0;
 
     initMemory();
     initializeScheduler();
@@ -171,11 +172,12 @@ int main(int argc, char **argv)
 
 
 
-    while (1) {
+    while (++clock) {
 
-        if(clock++ == arrivalTimes[i]) {
-            readProgramFile(argv[2 * i + 1]);
-            i++;
+        for(int i = 0; i < 3; i++) {
+            if (arrivalTimes[i] == clock) {
+                readProgramFile(argv[2 * i + 1]);
+            }
         }
 
         if (getRunningPid() == -1) {
@@ -223,6 +225,8 @@ int main(int argc, char **argv)
             schedEnqueue(getRunningPid());
             dispatch();
         }
+
+
     }
 
 //    printMemory();
