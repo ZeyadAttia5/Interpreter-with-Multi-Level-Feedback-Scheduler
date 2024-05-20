@@ -5,6 +5,7 @@
 #include <string.h>
 #include "queue.h"
 #include "STRING_OPERATIONS.h"
+#include "memory.h"
 
 
 // A linked list (LL) node to store a queue entry
@@ -133,4 +134,53 @@ void removeKey(struct Queue* q, int k)
 
     free(temp);
     q->size--;
+}
+
+
+/* Function to remove the element with the highest priority from the queue
+ * To get the element with the highest priority, we need to traverse the queue and find the element with the highest priority.
+ * The priority of the element is retrieved from the memory using the key as the pid.
+*/
+
+int dequeueHighestPriority(struct Queue* q)
+{
+    struct QNode* temp = q->front;
+    struct QNode* prev = NULL;
+    struct QNode* highestPriority = NULL;
+    struct QNode* prevHighestPriority = NULL;
+
+    int highestPriorityValue = -1;
+
+    while (temp != NULL) {
+        int priority = atoi(getPCBField("PRIORITY", temp->key).value);
+        if (priority > highestPriorityValue) {
+            highestPriorityValue = priority;
+            highestPriority = temp;
+            prevHighestPriority = prev;
+        }
+
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (highestPriority == NULL) {
+        return -1;
+    }
+
+    if (prevHighestPriority == NULL) {
+        q->front = highestPriority->next;
+    } else {
+        prevHighestPriority->next = highestPriority->next;
+    }
+
+    if (q->rear == highestPriority) {
+        q->rear = prevHighestPriority;
+    }
+
+    highestPriorityValue = highestPriority->key;
+
+    free(highestPriority);
+    q->size--;
+
+    return highestPriorityValue;
 }

@@ -174,6 +174,8 @@ int main(int argc, char **argv)
 
     while (++clock) {
 
+
+
         for(int i = 0; i < 3; i++) {
             if (arrivalTimes[i] == clock) {
                 readProgramFile(argv[2 * i + 1]);
@@ -185,6 +187,9 @@ int main(int argc, char **argv)
             continue;
         }
 
+        printf("-------------------- START MEMORY AT CLOCK %d -------------------\n", clock);
+        printMemory();
+        printf("-------------------- END MEMORY AT CLOCK %d -------------------\n", clock);
 
 
 
@@ -210,7 +215,7 @@ int main(int argc, char **argv)
 
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
             // remove PCB from memory
-            // removeProcess(getRunningPid());
+            removeProcess(getRunningPid());
             dispatch();
 
             continue;
@@ -229,7 +234,7 @@ int main(int argc, char **argv)
 
     }
 
-//    printMemory();
+
 
 
 }

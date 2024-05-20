@@ -8,16 +8,16 @@
 #include "pthread.h"
 #include "mlf_sched.h"
 #include "STRING_OPERATIONS.h"
-#include "../include/semaphore.h"
+#include "../include/mutex.h"
 #include "pcb.h"
 
-semaphore *inputBufferSemaphore, *outputBufferSemaphore, *fileBufferSemaphore;
+mutex *inputBufferSemaphore, *outputBufferSemaphore, *fileBufferSemaphore;
 
 void instruction_set_init() {
 
-    create_semaphore(1, "inputBuffer", &inputBufferSemaphore);
-    create_semaphore(1, "outputBuffer", &outputBufferSemaphore);
-    create_semaphore(1, "fileBuffer", &fileBufferSemaphore);
+    create_mutex(1, "inputBuffer", &inputBufferSemaphore);
+    create_mutex(1, "outputBuffer", &outputBufferSemaphore);
+    create_mutex(1, "fileBuffer", &fileBufferSemaphore);
 
 }
 
@@ -116,21 +116,21 @@ void semWait(char *x)
 {
     int pid = getRunningPid();
      if (!strcmp(x, "userInput")){
-         if(try_wait_semaphore(inputBufferSemaphore, pid) == 0){
+         if(try_wait_mutex(inputBufferSemaphore, pid) == 0){
 
              setRunningPid(-1); // to force the dispatcher to run the next process
              setRunningQuantum(1); // to force the dispatcher to run the next process
 
          }
      }else if (!strcmp(x, "userOutput")) {
-         if (try_wait_semaphore(outputBufferSemaphore, pid) == 0) {
+         if (try_wait_mutex(outputBufferSemaphore, pid) == 0) {
 
              setRunningPid(-1); // to force the dispatcher to run the next process
              setRunningQuantum(1); // to force the dispatcher to run the next process
 
          }
      } else if (!strcmp(x, "file")) {
-            if (try_wait_semaphore(fileBufferSemaphore, pid) == 0) {
+            if (try_wait_mutex(fileBufferSemaphore, pid) == 0) {
 
                 setRunningPid(-1); // to force the dispatcher to run the next process
                 setRunningQuantum(1); // to force the dispatcher to run the next process
@@ -156,11 +156,11 @@ void semSignal(char *x)
     int pid = -1;
 
     if (!strcmp(x, "userInput")) {
-        pid = signal_semaphore(inputBufferSemaphore);
+        pid = signal_mutex(inputBufferSemaphore);
     } else if (!strcmp(x, "userOutput")) {
-        pid = signal_semaphore(outputBufferSemaphore);
+        pid = signal_mutex(outputBufferSemaphore);
     } else if (!strcmp(x, "file")) {
-        pid = signal_semaphore(fileBufferSemaphore);
+        pid = signal_mutex(fileBufferSemaphore);
     }else{
         printf("Invalid semaphore name\n");
         return;
@@ -282,11 +282,11 @@ int isInstruction(char *instruction)
 void printSemaphores()
 {
     printf("Input Buffer Semaphore:\n");
-    print_semaphore_queue(inputBufferSemaphore);
+    print_mutex_queue(inputBufferSemaphore);
     printf("Output Buffer Semaphore:\n");
-    print_semaphore_queue(outputBufferSemaphore);
+    print_mutex_queue(outputBufferSemaphore);
     printf("File Buffer Semaphore:\n");
-    print_semaphore_queue(fileBufferSemaphore);
+    print_mutex_queue(fileBufferSemaphore);
 
 
 }

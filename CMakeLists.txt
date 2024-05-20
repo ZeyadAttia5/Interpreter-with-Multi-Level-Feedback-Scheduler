@@ -16,8 +16,8 @@ set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 add_executable(main ${SOURCES}
         include/STRING_OPERATIONS.h
         src/STRING_OPERATIONS.c
-        include/semaphore.h
-        src/semaphore.c
+        include/mutex.h
+        src/mutex.c
         src/pcb.c)
 
 # Link the math library

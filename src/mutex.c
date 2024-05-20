@@ -1,11 +1,11 @@
-#include "../include/semaphore.h"
+#include "../include/mutex.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "mlf_sched.h"
+#include "dispatcher.h"
 
 
-
-void create_semaphore(int initialValue, char* resourceName, semaphore **s)
+void create_mutex(int initialValue, char* resourceName, mutex **s)
 {
     if(initialValue != LOCKED && initialValue != UNLOCKED)
     {
@@ -13,45 +13,56 @@ void create_semaphore(int initialValue, char* resourceName, semaphore **s)
         return;
     }
 
-    *s = (semaphore *)malloc(sizeof(semaphore));
+    *s = (mutex *)malloc(sizeof(mutex));
     (*s)->value = initialValue;
     (*s)->queue = createQueue();
     (*s)->resourceName = resourceName;
 
 }
 
-void wait_semaphore(semaphore *s, int pid)
+void wait_mutex(mutex *s, int pid)
 {
     if(s->value == LOCKED)
     {
         enQueue(s->queue, pid);
+
     }else
     {
         printf("Process %d acquired resource %s\n", pid, s->resourceName);
         s->value = LOCKED;
+        s->pid = pid;
     }
 }
 
-int signal_semaphore(semaphore *s)
+int signal_mutex(mutex *s)
 {
+    if (s->pid != getRunningPid() && s->pid != -1)
+    {
+        printf("Process %d is not the owner of the resource %s\n", getRunningPid(), s->resourceName);
+        return -1;
+    }
     s->value = UNLOCKED;
     printf("Resource %s released\n", s->resourceName);
 
-    int unblockedPid = deQueue(s->queue);
+    int unblockedPid = dequeueHighestPriority(s->queue);
 
     schedRemoveBlockedKey(unblockedPid);
+
+    s->pid = -1;
+
+
 
     return unblockedPid;
 
 }
 
-void print_semaphore_queue(semaphore *s)
+void print_mutex_queue(mutex *s)
 {
     printQueue(s->queue);
 }
 
 
-int try_wait_semaphore(semaphore *s, int pid)
+int try_wait_mutex(mutex *s, int pid)
 {
     if(s->value == LOCKED)
     {
@@ -62,6 +73,7 @@ int try_wait_semaphore(semaphore *s, int pid)
     {
         printf("Process %d acquired resource %s\n", pid, s->resourceName);
         s->value = LOCKED;
+        s->pid = pid;
 
         return 1;
     }

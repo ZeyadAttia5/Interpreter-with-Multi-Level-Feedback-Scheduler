@@ -18,6 +18,6 @@ void printQueues();
 
 void try_unblock(char *resource);
 
-void schedRemoveBlockedKey(scunblockedPid);
+void schedRemoveBlockedKey(int unblockedPid);
 
 #endif

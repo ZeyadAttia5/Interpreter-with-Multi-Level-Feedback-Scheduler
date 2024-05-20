@@ -87,7 +87,8 @@ void printMemory()
 {
     for (int i = 0; i < MEMORY_SIZE; i++)
     {
-        printf("Memory[%d]: %s %s\n", i, memory[i].name, memory[i].value);
+        if (memory[i].name != NULL && strlen(memory[i].name) > 0)
+            printf("Memory[%d]: %s %s\n", i, memory[i].name, memory[i].value);
     }
 }
 

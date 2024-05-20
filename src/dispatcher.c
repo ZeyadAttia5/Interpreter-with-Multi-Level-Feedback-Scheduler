@@ -3,7 +3,7 @@
 #include "mlf_sched.h"
 #include "stddef.h"
 #include "stdio.h"
-#include "semaphore.h"
+#include "mutex.h"
 #include "insrtuction_set.h"
 
 int runningPid;
