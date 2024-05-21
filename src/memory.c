@@ -10,7 +10,7 @@
 
 
 static MemoryWord memory[MEMORY_SIZE];
-
+int numberOfRemovedProcesses = 0;
 
 
 void initMemory()
@@ -79,6 +79,7 @@ void removeProcess(int pcbIndex)
         memory[i].name = "";
         memory[i].value = "";
     }
+    numberOfRemovedProcesses++;
 
 //    PCB_COUNT--;
 }
@@ -109,3 +110,23 @@ char *getVariableValue(char *variableName, int runningPID)
     return NULL;
 }
 
+int isVariableExists(char *variableName, int runningPID)
+{
+    int upperBound = atoi(getPCBField("UPPER_BOUND", runningPID).value);
+    int lowerBound = atoi(getPCBField("LOWER_BOUND", runningPID).value);
+
+    for (int i = lowerBound; i <= upperBound; i++)
+    {
+        if (memory[i].name != NULL && !strcasecmp(memory[i].name, variableName))
+        {
+            return 1; // Variable exists
+        }
+    }
+    return 0; // Variable does not exist
+}
+
+
+int getNumberOfRemovedProcesses()
+{
+    return numberOfRemovedProcesses;
+}

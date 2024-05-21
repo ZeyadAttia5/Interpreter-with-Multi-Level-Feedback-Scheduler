@@ -27,6 +27,7 @@ void addNewPCB(char *upperBound, char *lowerBound);
 void removeProcess(int pcbIndex);
 void printMemory();
 char *getVariableValue(char *variableName, int runningPID);
+int isVariableExists(char *variableName, int runningPID);
 
 
 #endif //OS_PROJECT_MEMORY_H

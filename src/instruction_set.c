@@ -10,6 +10,10 @@
 #include "STRING_OPERATIONS.h"
 #include "../include/mutex.h"
 #include "pcb.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 mutex *inputBufferSemaphore, *outputBufferSemaphore, *fileBufferSemaphore;
 
@@ -31,7 +35,7 @@ void assign(char *x, char *y)
     {
         char *input = malloc(100);
         // TODO: MUST ADD "Please enter a value for x" before scanf but doesn't work
-        printf("Please enter a value for %s: ", x);
+        printf("Process[%d]: Please enter a value for %s: ", getRunningPid(), x);
         scanf("%[^\n]%*c", input);
         y = input;
     }
@@ -72,24 +76,46 @@ void assign(char *x, char *y)
 }
 void writeFile(char *filename, char *data)
 {
+    if (!strcmp("input", filename))
+    {
+        char *input = malloc(100);
+        // TODO: MUST ADD "Please enter a value for x" before scanf but doesn't work
+        printf("Process[%d]: Please enter a value for %s: ", getRunningPid(), "filename");
+        scanf("%[^\n]%*c", input);
+        filename = input;
+    }
     FILE *f = fopen(filename, "w");
     if (f == NULL)
     {
-        printf("Error opening file!\n");
-//        exit(1);
+        printf("Error opening file! EXITING PROCESS\n");
+        removeProcess(getRunningPid());
         return;
     }
 
+
+
     fprintf(f, "%s", data);
     fclose(f);
+
+
 }
 char *readFile(char *filename)
 {
+    if (!strcmp("input", filename))
+    {
+        char *input = malloc(100);
+        // TODO: MUST ADD "Please enter a value for x" before scanf but doesn't work
+        printf("Process[%d]: Please enter a value for %s: ", getRunningPid(), filename);
+        scanf("%[^\n]%*c", input);
+        filename = input;
+    }
     FILE *f = fopen(filename, "r");
     if (f == NULL)
     {
-        printf("Error opening file!\n");
-        exit(1);
+        printf("Error opening file! EXITING PROCESS\n");
+        removeProcess(getRunningPid());
+        setRunningPid(-1); // to force the dispatcher to run the next process
+        return NULL;
     }
 
     fseek(f, 0, SEEK_END);
@@ -98,7 +124,9 @@ char *readFile(char *filename)
 
     char *string = malloc(fsize + 1);
     fread(string, fsize, 1, f);
+    string[fsize] = '\0'; // add null terminator to the end of the string
     fclose(f);
+
 
     return string;
 
@@ -119,21 +147,21 @@ void semWait(char *x)
          if(try_wait_mutex(inputBufferSemaphore, pid) == 0){
 
              setRunningPid(-1); // to force the dispatcher to run the next process
-             setRunningQuantum(1); // to force the dispatcher to run the next process
+             setRunningQuantum(0); // to force the dispatcher to run the next process
 
          }
      }else if (!strcmp(x, "userOutput")) {
          if (try_wait_mutex(outputBufferSemaphore, pid) == 0) {
 
              setRunningPid(-1); // to force the dispatcher to run the next process
-             setRunningQuantum(1); // to force the dispatcher to run the next process
+             setRunningQuantum(0); // to force the dispatcher to run the next process
 
          }
      } else if (!strcmp(x, "file")) {
             if (try_wait_mutex(fileBufferSemaphore, pid) == 0) {
 
                 setRunningPid(-1); // to force the dispatcher to run the next process
-                setRunningQuantum(1); // to force the dispatcher to run the next process
+                setRunningQuantum(0); // to force the dispatcher to run the next process
             }
      }else{
          printf("Invalid semaphore name\n");
@@ -182,20 +210,71 @@ void handleNestedInstruction(char *instruction, char *args, int *isNested, char 
     {
 
         char *argsCopy = strdup(args);
-        char **tokens = str_split(argsCopy, ' ');
+        int len;
+        char **tokens = str_split(argsCopy, ' ', &len);
+        len--;
         *isNested = 1;
         MemoryWord nestedInstruction;
 
+//        write readFile a b
+//        write a readFile b
+//        write redFile a readFile b
+        char *filename1 = tokens[1];
+        if (isVariableExists(filename1, getRunningPid()))
+            filename1 = getVariableValue(filename1, getRunningPid());
+        if (len == 4)
+        {
 
 
-        char *file_data = readFile(getVariableValue(tokens[2], getRunningPid()));
-
-        *nestedOutput = file_data;
+            char *filename2 = tokens[3];
 
 
-        nestedInstruction.name = instruction;
-        nestedInstruction.value = strcat(tokens[0], " ");
-        nestedInstruction.value = strcat(nestedInstruction.value, file_data);
+            if (isVariableExists(filename2, getRunningPid()))
+                filename2 = getVariableValue(filename2, getRunningPid());
+
+            char *file1_data = readFile(filename1);
+            char *file2_data = readFile(filename2);
+
+            nestedInstruction.name = instruction;
+
+            nestedInstruction.value = strcat(file1_data, " ");
+            nestedInstruction.value = strcat(nestedInstruction.value, file2_data);
+
+        }else if (len == 3) {
+
+            char *file_data;
+
+            if(strstr(tokens[0], "readFile") != NULL) {
+                file_data = readFile(filename1);
+                nestedInstruction.value = strcat(file_data, " ");
+                nestedInstruction.value = strcat(nestedInstruction.value, tokens[2]);
+
+            }else if(strstr(tokens[1], "readFile") != NULL) {
+
+                char *filename = tokens[2];
+                if (isVariableExists(filename, getRunningPid()))
+                    filename = getVariableValue(filename, getRunningPid());
+
+                file_data = readFile(filename);
+                nestedInstruction.value = strcat(tokens[0], " ");
+                nestedInstruction.value = strcat(nestedInstruction.value, file_data);
+
+            }
+
+            if (file_data == NULL) {
+
+                setRunningPid(-1);
+                return;
+            }
+
+            *nestedOutput = file_data;
+
+
+            nestedInstruction.name = instruction;
+
+
+        }
+
 
         executeInstruction(nestedInstruction);
 
@@ -226,35 +305,46 @@ void executeInstruction(MemoryWord currentInstruction)
     }
 
     if(!strcmp(instruction, "print")) {
-        print(getVariableValue(args, getRunningPid()));
+        if (isVariableExists(args, getRunningPid()))
+            print(getVariableValue(args, getRunningPid()));
+        else
+            print(args);
     }else if(!strcmp(instruction, "readFile")) {
-        readFile(getVariableValue(args, getRunningPid()));
+        if (isVariableExists(args, getRunningPid()))
+            readFile(getVariableValue(args, getRunningPid()));
+        else
+            readFile(args);
+
     }else if(!strcmp(instruction, "writeFile")) {
         char *argsCopy = strdup(args);
-        char **tokens = str_split(argsCopy, ' ');
+        char **tokens = str_split(argsCopy, ' ', NULL);
         char *filename = tokens[0];
         char *data = tokens[1];
 
-        filename = getVariableValue(filename, getRunningPid());
+        if (isVariableExists(filename, getRunningPid()))
+            filename = getVariableValue(filename, getRunningPid());
 
-        data = getVariableValue(data, getRunningPid());
+        if (isVariableExists(data, getRunningPid()))
+            data = getVariableValue(data, getRunningPid());
 
         writeFile(filename, data);
 
     } else if (!strcmp(instruction, "printFromTo")) {
         char * argsCopy = strdup(args);
-        char **tokens = str_split(argsCopy, ' ');
+        char **tokens = str_split(argsCopy, ' ', NULL);
 
         // get the two numbers
-        tokens[0] = getVariableValue(tokens[0], getRunningPid());
-        tokens[1] = getVariableValue(tokens[1], getRunningPid());
+        if (isVariableExists(tokens[0], getRunningPid()))
+            tokens[0] = getVariableValue(tokens[0], getRunningPid());
+        if (isVariableExists(tokens[1], getRunningPid()))
+            tokens[1] = getVariableValue(tokens[1], getRunningPid());
 
         int x = atoi(tokens[0]);
         int y = atoi(tokens[1]);
         printFromTo(x, y);
     } else if (!strcmp(instruction, "assign")) {
         char *argsCopy = strdup(args);
-        char **tokens = str_split(argsCopy, ' ');
+        char **tokens = str_split(argsCopy, ' ', NULL);
         char *x = tokens[0];
         char *y = tokens[1];
         assign(x, y);

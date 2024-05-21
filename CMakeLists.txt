@@ -12,6 +12,7 @@ file(GLOB SOURCES "src/*.c" "include/*.h")
 # Set C compiler flags for debugging
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 
+
 # Create the executable named main from the source files
 add_executable(main ${SOURCES}
         include/STRING_OPERATIONS.h

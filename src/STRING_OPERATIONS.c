@@ -17,7 +17,7 @@
  *         The last element of the array is set to NULL to indicate the end of the list.
  *         The caller is responsible for freeing the memory allocated for the array and its elements.
  */
-char **str_split(char *a_str, char a_delim)
+char **str_split(char *a_str, char a_delim, int *length)
 {
     char **result = 0;
     size_t count = 0;
@@ -37,6 +37,8 @@ char **str_split(char *a_str, char a_delim)
         }
         tmp++;
     }
+
+
 
     /* Add space for trailing token. */
     count += last_comma < (a_str + strlen(a_str) - 1);
@@ -60,6 +62,11 @@ char **str_split(char *a_str, char a_delim)
         }
         assert(idx == count - 1);
         *(result + idx) = 0;
+    }
+
+    if (length != NULL)
+    {
+        *length = count;
     }
 
     return result;

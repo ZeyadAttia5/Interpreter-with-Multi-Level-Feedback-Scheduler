@@ -22,6 +22,7 @@ int memoryAddress = 0;
 int pid = 1;
 
 
+
 /**
  * Parses an array of tokens and generates an instruction based on the tokens.
  * The generated instruction is then written to the specified memory address.
@@ -79,6 +80,9 @@ void readProgramFile(char *programFilePath)
         printf("Cannot open file \n");
         exit(0);
     }
+
+
+
     char *line = NULL;
 
     size_t len = 0;
@@ -96,7 +100,7 @@ void readProgramFile(char *programFilePath)
             continue;
 
         // split line by space
-        char **tokens = str_split(line, ' ');
+        char **tokens = str_split(line, ' ', NULL);
 
         // parse tokens
         parseTokens(tokens);
@@ -115,6 +119,8 @@ void readProgramFile(char *programFilePath)
 
     addNewPCB(upperBoundStr, lowerBoundStr);
     schedEnqueue(pid++);
+    memoryAddress++;
+
 }
 
 
@@ -147,7 +153,7 @@ void readProgramFiles(char *dirPath) {
 
 int main(int argc, char **argv)
 {
-    /* TODO: Write new programs to test with */
+
 
     // To run program run: ./main <program 1 path> <arrival time> <program 2 path> <arrival time> <program 3 path> <arrival time>
 
@@ -161,6 +167,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < 3; i++) {
         arrivalTimes[i] = atoi(argv[2 * i + 2]);
 
+
     }
 
     int clock = 0;
@@ -172,9 +179,9 @@ int main(int argc, char **argv)
 
 
 
-    while (++clock) {
+    while ((argc - 1) / 2 > getNumberOfRemovedProcesses()) {
 
-
+        clock++;
 
         for(int i = 0; i < 3; i++) {
             if (arrivalTimes[i] == clock) {
@@ -184,26 +191,21 @@ int main(int argc, char **argv)
 
         if (getRunningPid() == -1) {
             dispatch();
-            continue;
+            if (getRunningPid() == -1) {
+                continue;
+            }
         }
 
-        printf("-------------------- START MEMORY AT CLOCK %d -------------------\n", clock);
-        printMemory();
-        printf("-------------------- END MEMORY AT CLOCK %d -------------------\n", clock);
+//        printf("-------------------- START MEMORY AT CLOCK %d -------------------\n", clock);
+//        printMemory();
+//        printf("-------------------- END MEMORY AT CLOCK %d -------------------\n", clock);
 
 
 
         int pc = atoi(getPCBField("PC", getRunningPid()).value);
 
         MemoryWord currentInstruction = getMemoryWord(pc);
-
-        executeInstruction(currentInstruction);
-
-        if (getRunningPid() == -1) {
-            continue;
-        }
         incrementPC(getRunningPid());
-
         pc = atoi(getPCBField("PC", getRunningPid()).value);
 
         int upperBound = atoi(getPCBField("UPPER_BOUND", getRunningPid()).value);
@@ -212,14 +214,31 @@ int main(int argc, char **argv)
         MemoryWord word = getMemoryWord(pc);
 
         // if word is null or empty or out of bounds or not an instruction
-
+        int previousPid = getRunningPid();
+        int willBeRemoved = 0;
         if (word.name == NULL || word.value == NULL || pc > upperBound || pc < lowerBound || !isInstruction(word.name)) {
-            // remove PCB from memory
-            removeProcess(getRunningPid());
-            dispatch();
+            willBeRemoved = 1;
 
+        }else{
+            willBeRemoved = 0;
+        }
+
+        executeInstruction(currentInstruction);
+        if (willBeRemoved) {
+            removeProcess(previousPid);
+            setRunningPid(-1);
+            continue;
+
+        }
+        if (getRunningPid() == -1) {
             continue;
         }
+
+
+
+
+
+
 
 
 
@@ -228,12 +247,15 @@ int main(int argc, char **argv)
 
         if (++runningQuantum >= getCurrentQueueQuantum()){
             schedEnqueue(getRunningPid());
-            dispatch();
+            setRunningPid(-1);
         }
 
 
     }
 
+    printf("-------------------- FINAL MEMORY STATE -------------------\n");
+    printMemory();
+    printf("-------------------- END MEMORY FINAL STATE -------------------\n");
 
 
 
