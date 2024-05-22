@@ -78,3 +78,7 @@ This project implements an interpreter for a custom mini-language. The interpret
    - Provide necessary input via the command line as prompted by your programs until execution completes.
 
 
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
