@@ -3,9 +3,21 @@
 This project implements an interpreter for a custom mini-language. The interpreter supports various commands for basic input/output operations, file handling, and mutual exclusion using semaphores. The interpreter operates with a multi-level feedback queue (MLFQ) and supports single-level nested commands.
 
 ## Team
-<a href="https://github.com/ZeyadAttia5/Interpreter-with-Multi-Level-Feedback-Scheduler/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=https://github.com/ZeyadAttia5/Interpreter-with-Multi-Level-Feedback-Scheduler" />
-</a>
+<!-- 
+  <a href="https://github.com/ZeyadAttia5/Interpreter-with-Multi-Level-Feedback-Scheduler/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=ZeyadAttia5/Interpreter-with-Multi-Level-Feedback-Scheduler" />
+  </a> 
+-->
+[Amr Hegazy](https://github.com/Amr-Hegazy1)
+
+[Ali Hany](https://github.com/alilabib03)
+
+[Mohamed Wael](https://github.com/mowaell)
+
+[Omar Saqr](https://github.com/Omarsaqr)
+
+[Zeyad Attia](https://github.com/ZeyadAttia5)
+
 
 ## Table of Contents
 - [Features](#features)
