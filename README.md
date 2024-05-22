@@ -55,6 +55,20 @@ This project implements an interpreter for a custom mini-language. The interpret
 1. Clone the repository:
    ```shell
    git clone https://github.com/your-repo-link.git
-  shell```
-2. 
+
+2. Build the Project:
+   ```shell
+   mkdir build
+   cd build
+ - Run CMake to configure the project:
+  ```shell
+     cmake ..
+  - Compile the project:
+    ```shell
+      make
+
+3. Create Your Programs:
+- Create up to 3 program files with a .txt extension.
+- Populate these files with logic using the mini-language described in the [Commands](#commands) section.
+
 
