@@ -57,19 +57,24 @@ This project implements an interpreter for a custom mini-language. The interpret
    git clone https://github.com/your-repo-link.git
 
 2. Build the Project:
-   ```shell
-   mkdir build
-   cd build
- 
- - Run CMake to configure the project:
-   ```shell
-     cmake ..
+     ```shell
+     mkdir build
+     cd build
+  - Run CMake to configure the project:
+     ```shell
+        cmake ..
   - Compile the project:
-    ```shell
-      make
-
+     ```shell
+        make
 3. Create Your Programs:
-- Create up to 3 program files with a .txt extension.
-- Populate these files with logic using the mini-language described in the [Commands](#commands) section.
+  - Create up to 3 program files with a .txt extension.
+  - Populate these files with logic using the mini-language described in the [Commands](#commands) section.
+
+4. Run the Interpreter:
+  - In the build directory, execute the interpreter with your program files and their respective arrival times:
+      ```shell
+      ./main program1.txt arrival_time1 program2.txt arrival_time2 program3.txt arrival_time3
+5. Supply Input:
+   - Provide necessary input via the command line as prompted by your programs until execution completes.
 
 
