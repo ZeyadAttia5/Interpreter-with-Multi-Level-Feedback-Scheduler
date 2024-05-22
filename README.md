@@ -8,15 +8,15 @@ This project implements an interpreter for a custom mini-language. The interpret
     <img src="https://contrib.rocks/image?repo=ZeyadAttia5/Interpreter-with-Multi-Level-Feedback-Scheduler" />
   </a> 
 -->
-[Amr Hegazy](https://github.com/Amr-Hegazy1)
+- [Amr Hegazy](https://github.com/Amr-Hegazy1)
 
-[Ali Hany](https://github.com/alilabib03)
+- [Ali Hany](https://github.com/alilabib03)
 
-[Mohamed Wael](https://github.com/mowaell)
+- [Mohamed Wael](https://github.com/mowaell)
 
-[Omar Saqr](https://github.com/Omarsaqr)
+- [Omar Saqr](https://github.com/Omarsaqr)
 
-[Zeyad Attia](https://github.com/ZeyadAttia5)
+- [Zeyad Attia](https://github.com/ZeyadAttia5)
 
 
 ## Table of Contents
