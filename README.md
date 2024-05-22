@@ -60,8 +60,9 @@ This project implements an interpreter for a custom mini-language. The interpret
    ```shell
    mkdir build
    cd build
+ 
  - Run CMake to configure the project:
-  ```shell
+   ```shell
      cmake ..
   - Compile the project:
     ```shell
